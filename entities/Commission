@@ -1,0 +1,26 @@
+{
+  "name": "Commission",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string",
+      "description": "Business ID"
+    },
+    "employee_id": {
+      "type": "string",
+      "description": "Employee ID (specific override)"
+    },
+    "job_role_id": {
+      "type": "string",
+      "description": "Job Role ID (base commission by role)"
+    },
+    "percentage": {
+      "type": "number",
+      "description": "Commission percentage (0-100)"
+    }
+  },
+  "required": [
+    "business_id",
+    "percentage"
+  ]
+}

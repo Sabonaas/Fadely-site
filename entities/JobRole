@@ -1,0 +1,26 @@
+{
+  "name": "JobRole",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Role name (e.g. Barbeiro, Cabeleireiro)"
+    },
+    "business_id": {
+      "type": "string",
+      "description": "Business ID"
+    },
+    "color": {
+      "type": "string",
+      "description": "Display color"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "business_id"
+  ]
+}

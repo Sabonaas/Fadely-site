@@ -1,0 +1,50 @@
+{
+  "name": "Appointment",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string",
+      "description": "Business ID"
+    },
+    "service_id": {
+      "type": "string",
+      "description": "Service ID"
+    },
+    "service_name": {
+      "type": "string",
+      "description": "Service name snapshot"
+    },
+    "employee_id": {
+      "type": "string",
+      "description": "Employee ID"
+    },
+    "employee_name": {
+      "type": "string",
+      "description": "Employee name snapshot"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "Client ID (if registered)"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Client name"
+    },
+    "client_phone": {
+      "type": "string",
+      "description": "Client phone"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Client email"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Appointment date"
+    },
+    "time": {
+      "type": "string",
+      "description": "Appointment time (HH:MM)"
+    },
+    "duration": {

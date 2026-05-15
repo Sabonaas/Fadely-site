@@ -1,0 +1,66 @@
+{
+  "name": "Employee",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Employee name"
+    },
+    "email": {
+      "type": "string",
+      "description": "Employee email"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Employee phone"
+    },
+    "role": {
+      "type": "string",
+      "description": "Role/position (legacy text)"
+    },
+    "job_role_id": {
+      "type": "string",
+      "description": "JobRole entity ID"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Avatar URL"
+    },
+    "business_id": {
+      "type": "string",
+      "description": "Business ID"
+    },
+    "service_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Services this employee can perform"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "working_hours": {
+      "type": "object",
+      "description": "Individual working hours"
+    },
+    "color": {
+      "type": "string",
+      "description": "Display color for calendar"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio vinculado (login do funcion\u00e1rio)"
+    },
+    "is_linked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se o funcion\u00e1rio aceitou o convite e tem login vinculado"
+    }
+  },
+  "required": [
+    "name",
+    "business_id"
+  ]
+}

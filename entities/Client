@@ -1,0 +1,58 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Client name"
+    },
+    "email": {
+      "type": "string",
+      "description": "Client email"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Client phone/WhatsApp"
+    },
+    "business_id": {
+      "type": "string",
+      "description": "Business ID"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Client notes (allergies, preferences, etc.)"
+    },
+    "birthday": {
+      "type": "string",
+      "format": "date",
+      "description": "Client birthday"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Avatar URL"
+    },
+    "total_visits": {
+      "type": "number",
+      "default": 0
+    },
+    "total_spent": {
+      "type": "number",
+      "default": 0
+    },
+    "last_visit": {
+      "type": "string",
+      "format": "date"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Client tags"
+    }
+  },
+  "required": [
+    "name",
+    "business_id"
+  ]
+}

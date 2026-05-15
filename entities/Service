@@ -1,0 +1,51 @@
+{
+  "name": "Service",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Service name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Service description"
+    },
+    "price": {
+      "type": "number",
+      "description": "Price in BRL"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration in minutes"
+    },
+    "category": {
+      "type": "string",
+      "description": "Service category"
+    },
+    "business_id": {
+      "type": "string",
+      "description": "Business ID"
+    },
+    "employee_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Assigned employee IDs"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "color": {
+      "type": "string",
+      "description": "Display color"
+    }
+  },
+  "required": [
+    "name",
+    "price",
+    "duration",
+    "business_id"
+  ]
+}

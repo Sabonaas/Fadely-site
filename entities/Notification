@@ -1,0 +1,62 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string",
+      "description": "Business ID"
+    },
+    "appointment_id": {
+      "type": "string",
+      "description": "Related appointment ID"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "confirmation",
+        "reminder",
+        "reschedule",
+        "cancellation",
+        "follow_up"
+      ],
+      "description": "Notification type"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "whatsapp",
+        "email",
+        "sms"
+      ],
+      "default": "whatsapp"
+    },
+    "recipient_phone": {
+      "type": "string"
+    },
+    "recipient_name": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "delivered",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "scheduled_for": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "business_id",
+    "type"
+  ]
+}
