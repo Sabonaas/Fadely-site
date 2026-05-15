@@ -38,12 +38,14 @@ export default function Employees() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.createEmployee({ ...data, business_id: business.id }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['employees'] }); closeForm(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['employees'] }); closeForm(); toast.success('Colaborador criado'); },
+    onError: (e) => toast.error(e.message || 'Erro ao criar colaborador'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => db.updateEmployee(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['employees'] }); closeForm(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['employees'] }); closeForm(); toast.success('Colaborador atualizado'); },
+    onError: (e) => toast.error(e.message || 'Erro ao atualizar'),
   });
 
   const deleteMutation = useMutation({
@@ -59,18 +61,38 @@ export default function Employees() {
   };
   const closeForm = () => { setShowForm(false); setEditing(null); };
 
-  const copyInviteLink = (emp) => {
-    const inviteCode = business.invite_code || business.id;
-    const url = `${window.location.origin}/employee-invite?code=${inviteCode}&eid=${emp.id}`;
-    navigator.clipboard.writeText(url);
-    toast.success('Link de convite copiado!');
+  const copyInviteLink = async (emp = null) => {
+    try {
+      const inv = await db.createEmployeeInviteRpc(business.id, emp?.id ?? null, emp?.email ?? null);
+      const url = `${window.location.origin}/employee-invite?token=${inv.token}`;
+      await navigator.clipboard.writeText(url);
+      toast.success('Link de cadastro copiado!');
+    } catch (e) {
+      const inviteCode = business.invite_code || business.id;
+      const url = `${window.location.origin}/employee-invite?code=${inviteCode}${emp ? `&eid=${emp.id}` : ''}`;
+      await navigator.clipboard.writeText(url);
+      toast.success('Link de convite copiado (legado)');
+    }
+  };
+
+  const buildEmployeePayload = () => {
+    const selectedRole = roles.find((r) => r.id === form.job_role_id);
+    const payload = {
+      name: form.name,
+      email: form.email || undefined,
+      phone: form.phone || undefined,
+      role: selectedRole ? selectedRole.name : form.role,
+      color: form.color,
+    };
+    if (form.job_role_id && form.job_role_id !== '__other__') {
+      payload.job_role_id = form.job_role_id;
+    }
+    return payload;
   };
 
   const handleSubmit = (ev) => {
     ev.preventDefault();
-    // Resolve role text from job_role_id
-    const selectedRole = roles.find(r => r.id === form.job_role_id);
-    const data = { ...form, role: selectedRole ? selectedRole.name : form.role };
+    const data = buildEmployeePayload();
     if (editing) {
       updateMutation.mutate({ id: editing.id, data });
     } else {
@@ -90,16 +112,20 @@ export default function Employees() {
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-white">Colaboradores</h1>
+          <h1 className="dashboard-page-title">Colaboradores</h1>
           <p className="text-white/40 mt-1 text-sm">{employees.length}/{maxEmployees === Infinity ? '∞' : maxEmployees} colaboradores</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button onClick={() => setShowRoles(true)} variant="outline"
-            className="border-white/10 text-white/50 hover:bg-white/5 hover:text-white rounded-xl gap-2 text-sm">
+            className="border-border text-muted-foreground hover:bg-accent rounded-xl gap-2 text-sm">
             <Briefcase className="w-4 h-4" /> Cargos
           </Button>
+          <Button onClick={() => copyInviteLink()} variant="outline"
+            className="border-border text-muted-foreground hover:bg-accent rounded-xl gap-2 text-sm">
+            <Link2 className="w-4 h-4" /> Copiar link de cadastro
+          </Button>
           {canAdd ? (
-            <Button onClick={openNew} className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl gap-2">
+            <Button onClick={openNew} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2">
               <Plus className="w-4 h-4" /> Adicionar
             </Button>
           ) : (

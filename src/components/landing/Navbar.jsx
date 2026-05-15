@@ -38,11 +38,9 @@ export default function Navbar() {
       initial={{ opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] max-w-5xl"
+      className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] max-w-5xl flex flex-col gap-2"
     >
-      {/* Main bar */}
       <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 rounded-2xl" style={glassNav}>
-
         {/* Logo */}
         <div className="flex-shrink-0">
           <Link to="/"><FadelyLogo size="sm" /></Link>
@@ -141,7 +139,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0, scaleY: 1 }}
             exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-2 rounded-2xl overflow-hidden"
+            className="rounded-2xl overflow-hidden"
             style={{
               background: isDark ? 'rgba(10,11,15,0.97)' : 'rgba(255,255,255,0.97)',
               backdropFilter: 'blur(24px)',

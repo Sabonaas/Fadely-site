@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as db from '@/repositories/db';
@@ -15,6 +15,9 @@ import PhoneInput from '@/components/settings/PhoneInput';
 import CategorySelect from '@/components/settings/CategorySelect';
 import SocialInput from '@/components/settings/SocialInput';
 import AddressSection from '@/components/settings/AddressSection';
+import BrandingSettings from '@/components/settings/BrandingSettings';
+import PlanChangeModal from '@/components/settings/PlanChangeModal';
+import { planDisplayName } from '@/lib/planConfig';
 
 const timeOptions = [];
 for (let h = 6; h <= 23; h++) {
@@ -28,11 +31,10 @@ function Section({ title, icon: Icon, children, delay = 0 }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="rounded-2xl p-5 space-y-4"
-      style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
+      className="dashboard-card p-5 space-y-4"
     >
-      <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-        <Icon className="w-4 h-4 text-blue-400" /> {title}
+      <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+        <Icon className="w-4 h-4 text-primary" /> {title}
       </h2>
       {children}
     </motion.div>
@@ -42,7 +44,7 @@ function Section({ title, icon: Icon, children, delay = 0 }) {
 function FieldGroup({ label, children }) {
   return (
     <div>
-      <Label className="text-white/35 text-xs font-medium uppercase tracking-wide mb-1.5 block">{label}</Label>
+      <Label className="text-muted-foreground text-xs font-medium uppercase tracking-wide mb-1.5 block">{label}</Label>
       {children}
     </div>
   );
@@ -53,6 +55,16 @@ const inputStyle = { background: 'rgba(255,255,255,0.05)', border: '1px solid rg
 export default function Settings() {
   const { business } = useOutletContext();
   const queryClient = useQueryClient();
+  const [planModalOpen, setPlanModalOpen] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') === 'success') {
+      toast.success('Assinatura atualizada com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ['my-business'] });
+      window.history.replaceState({}, '', '/dashboard/settings');
+    }
+  }, [queryClient]);
 
   const [form, setForm] = useState({
     name: business.name || '',
@@ -100,19 +112,16 @@ export default function Settings() {
     });
   };
 
-  const planLabel = {
-    free_trial: 'Período de Teste',
-    starter: 'Essencial',
-    professional: 'Crescimento',
-    enterprise: 'Elite',
-  }[business.subscription_plan] || business.subscription_plan;
+  const planLabel = planDisplayName(business.subscription_plan);
 
   return (
     <div className="space-y-6 max-w-2xl">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Configurações</h1>
-        <p className="text-white/35 text-sm mt-0.5">Gerencie as informações do seu estabelecimento</p>
+        <h1 className="dashboard-page-title">Configurações</h1>
+        <p className="dashboard-muted mt-0.5">Gerencie as informações do seu estabelecimento</p>
       </motion.div>
+
+      <BrandingSettings business={business} organizationId={business.organization_id} />
 
       <form onSubmit={handleSave} className="space-y-4">
 
@@ -221,10 +230,13 @@ export default function Settings() {
                   business.subscription_status === 'active' ? 'Ativo' : business.subscription_status}
               </p>
             </div>
-            <a href="#pricing" className="px-4 py-2 rounded-xl text-xs font-medium text-white/60 hover:text-white transition-all"
-              style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
+            <button
+              type="button"
+              onClick={() => setPlanModalOpen(true)}
+              className="px-4 py-2 rounded-xl text-xs font-medium text-foreground border border-border bg-accent/50 hover:bg-accent transition-all"
+            >
               Trocar Plano
-            </a>
+            </button>
           </div>
         </Section>
 
@@ -245,6 +257,8 @@ export default function Settings() {
           )}
         </motion.button>
       </form>
+
+      <PlanChangeModal open={planModalOpen} onClose={() => setPlanModalOpen(false)} business={business} />
     </div>
   );
 }

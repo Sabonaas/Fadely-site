@@ -1,4 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
+import { sanitizeUuidPayload, logDbPayload } from '@/lib/payloadUtils';
+import { createEmployeeSchema, updateEmployeeSchema } from '@/validations/employee.schema';
 
 function err(ctx, e) {
   if (e) {
@@ -12,6 +14,70 @@ export function generateInviteCode() {
     Math.random().toString(36).substring(2, 10).toUpperCase() +
     Math.random().toString(36).substring(2, 6).toUpperCase()
   );
+}
+
+/** Slug URL-safe a partir do nome (base; unicidade via RPC no servidor). */
+export function slugifyBusinessName(name) {
+  const base = (name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+  return base || 'negocio';
+}
+
+export async function ensureUniqueBusinessSlugRpc(baseSlug) {
+  const { data, error } = await supabase.rpc('ensure_unique_business_slug', {
+    p_base: baseSlug,
+  });
+  err('ensureUniqueBusinessSlugRpc', error);
+  return data;
+}
+
+export async function completeOnboardingRpc(payload) {
+  const { data, error } = await supabase.rpc('complete_onboarding', {
+    p_business_name: payload.name,
+    p_business_type: payload.type,
+    p_employee_count: payload.employee_count,
+    p_phone: payload.phone || null,
+    p_whatsapp_connected: payload.whatsapp_connected ?? false,
+    p_open_time: payload.open_time || '08:00',
+    p_close_time: payload.close_time || '18:00',
+    p_slug_hint: payload.slug_hint || null,
+  });
+  if (!error) return data;
+
+  // Fallback se migration 007 ainda não foi aplicada
+  if (error.code === 'PGRST202' || error.message?.includes('complete_onboarding')) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw error;
+    const base = payload.slug_hint || slugifyBusinessName(payload.name);
+    let uniqueSlug = base;
+    try {
+      uniqueSlug = (await ensureUniqueBusinessSlugRpc(base)) || base;
+    } catch {
+      uniqueSlug = `${base}-${user.id.slice(0, 8)}`;
+    }
+    return createBusiness({
+      owner_id: user.id,
+      owner_email: user.email,
+      name: payload.name,
+      type: payload.type,
+      slug: uniqueSlug,
+      employee_count: payload.employee_count,
+      phone: payload.phone,
+      whatsapp_connected: payload.whatsapp_connected,
+      onboarding_completed: true,
+      subscription_plan: 'free_trial',
+      subscription_status: 'trial',
+      booking_page_enabled: true,
+      working_hours: { open: payload.open_time, close: payload.close_time },
+      invite_code: generateInviteCode(),
+    });
+  }
+  err('completeOnboardingRpc', error);
+  return data;
 }
 
 // ── Auth helpers (thin) ─────────────────────────────────────────────────────
@@ -75,7 +141,16 @@ export async function getBusinessBySlugForPublic(slug) {
 }
 
 export async function createBusiness(row) {
-  const { data, error } = await supabase.from('businesses').insert(row).select().single();
+  const toInsert = { ...row };
+  if (toInsert.slug) {
+    try {
+      const unique = await ensureUniqueBusinessSlugRpc(toInsert.slug);
+      if (unique) toInsert.slug = unique;
+    } catch {
+      toInsert.slug = `${toInsert.slug}-${Date.now().toString(36).slice(-6)}`;
+    }
+  }
+  const { data, error } = await supabase.from('businesses').insert(toInsert).select().single();
   err('createBusiness', error);
   return data;
 }
@@ -136,16 +211,43 @@ export async function listEmployeesByUserEmail(email) {
   return data || [];
 }
 
+export async function getBusinessOrganizationIdRpc(businessId) {
+  const { data, error } = await supabase.rpc('get_business_organization_id', {
+    p_business_id: businessId,
+  });
+  err('getBusinessOrganizationIdRpc', error);
+  return data;
+}
+
 export async function createEmployee(row) {
-  const { data, error } = await supabase.from('employees').insert(row).select().single();
+  const sanitized = sanitizeUuidPayload(row, [
+    'job_role_id',
+    'organization_member_id',
+    'auth_user_id',
+    'user_id',
+    'employee_id',
+    'business_id',
+  ]);
+  const payload = createEmployeeSchema.parse(sanitized);
+  logDbPayload('createEmployee', payload);
+  const { data, error } = await supabase.from('employees').insert(payload).select().single();
   err('createEmployee', error);
   return data;
 }
 
 export async function updateEmployee(id, patch) {
+  const sanitized = sanitizeUuidPayload(patch, [
+    'job_role_id',
+    'organization_member_id',
+    'auth_user_id',
+    'user_id',
+    'employee_id',
+  ]);
+  const payload = updateEmployeeSchema.parse(sanitized);
+  logDbPayload('updateEmployee', { id, ...payload });
   const { data, error } = await supabase
     .from('employees')
-    .update({ ...patch, updated_at: new Date().toISOString() })
+    .update({ ...payload, updated_at: new Date().toISOString() })
     .eq('id', id)
     .select()
     .single();
@@ -254,7 +356,15 @@ export async function listAppointmentsByEmployee(employeeId) {
 }
 
 export async function createAppointment(row) {
-  const { data, error } = await supabase.from('appointments').insert(row).select().single();
+  const payload = sanitizeUuidPayload(row, [
+    'business_id',
+    'service_id',
+    'employee_id',
+    'client_id',
+    'organization_id',
+  ]);
+  logDbPayload('createAppointment', payload);
+  const { data, error } = await supabase.from('appointments').insert(payload).select().single();
   err('createAppointment', error);
   return data;
 }
@@ -303,4 +413,58 @@ export async function createJobRole(row) {
 export async function deleteJobRole(id) {
   const { error } = await supabase.from('job_roles').delete().eq('id', id);
   err('deleteJobRole', error);
+}
+
+// ── Coupons ───────────────────────────────────────────────────────────────────
+export async function listCouponsByBusiness(businessId) {
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .eq('business_id', businessId)
+    .order('created_at', { ascending: false });
+  err('listCouponsByBusiness', error);
+  return data || [];
+}
+
+export async function createCoupon(row) {
+  const { data, error } = await supabase.from('coupons').insert(row).select().single();
+  err('createCoupon', error);
+  return data;
+}
+
+export async function updateCoupon(id, patch) {
+  const { data, error } = await supabase.from('coupons').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+  err('updateCoupon', error);
+  return data;
+}
+
+export async function validateCouponRpc(businessId, code, clientId = null) {
+  const { data, error } = await supabase.rpc('validate_coupon', {
+    p_business_id: businessId,
+    p_code: code,
+    p_client_id: clientId,
+  });
+  err('validateCouponRpc', error);
+  return data;
+}
+
+// ── Employee invites (secure token) ───────────────────────────────────────────
+export async function createEmployeeInviteRpc(businessId, employeeId = null, email = null) {
+  const { data, error } = await supabase.rpc('create_employee_invite', {
+    p_business_id: businessId,
+    p_employee_id: employeeId,
+    p_email: email,
+    p_days_valid: 7,
+  });
+  err('createEmployeeInviteRpc', error);
+  return data;
+}
+
+export async function createAppointmentWithServicesRpc(appointment, services) {
+  const { data, error } = await supabase.rpc('create_appointment_with_services', {
+    p_appointment: appointment,
+    p_services: services,
+  });
+  err('createAppointmentWithServicesRpc', error);
+  return data;
 }

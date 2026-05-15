@@ -83,30 +83,29 @@ export default function Onboarding() {
         goToLogin('/onboarding');
         return;
       }
-      const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      await db.createBusiness({
-        owner_id: user.id,
-        owner_email: user.email,
-        name: data.name,
+      await db.completeOnboardingRpc({
+        name: data.name.trim(),
         type: data.type,
-        slug: slug || `negocio-${user.id.slice(0, 8)}`,
         employee_count: data.employee_count,
         phone: data.phone,
         whatsapp_connected: data.whatsapp_connected,
-        onboarding_completed: true,
-        subscription_plan: 'free_trial',
-        subscription_status: 'trial',
-        booking_page_enabled: true,
-        working_hours: {
-          open: data.open_time,
-          close: data.close_time,
-        },
+        open_time: data.open_time,
+        close_time: data.close_time,
+        slug_hint: db.slugifyBusinessName(data.name),
       });
       await queryClient.invalidateQueries({ queryKey: ['my-business'] });
       await queryClient.refetchQueries({ queryKey: ['my-business'] });
       navigate('/dashboard');
     } catch (e) {
-      const msg = e?.message || 'Não foi possível criar o estabelecimento. Verifica o Supabase (RLS, duplicado de slug) ou a consola.';
+      let msg = e?.message || 'Não foi possível criar o estabelecimento.';
+      if (e?.code === '23505' || /slug/i.test(msg)) {
+        msg = 'Este link de agendamento já está em uso. Tente novamente — um sufixo será adicionado automaticamente.';
+      }
+      if (msg.includes('onboarding_already_completed')) {
+        msg = 'Onboarding já concluído. A redirecionar…';
+        navigate('/dashboard');
+        return;
+      }
       toast.error(msg);
     } finally {
       setSaving(false);

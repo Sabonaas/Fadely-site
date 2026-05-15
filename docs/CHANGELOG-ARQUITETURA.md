@@ -81,3 +81,32 @@ Registro incremental de mudanças estruturais (sem alteração intencional de de
 ### Rollback
 
 - Restaurar commit anterior a esta migração e reinstalar dependências Base44.
+
+---
+
+## Backend SaaS — Multi-tenant, RBAC, Stripe, TypeScript
+
+**Data:** 2026-05-15
+
+### O que foi adicionado
+
+- **Migrations** `004_saas_multi_tenant.sql` e `005_rbac_rls_analytics.sql`: `organizations`, `organization_members`, `payments`, `subscriptions`, `user_notifications`, `audit_logs`, `blocked_time_slots`, `whatsapp_messages`, RBAC, analytics RPCs.
+- **Camada TypeScript** em `src/types`, `validations`, `policies`, `middleware`, `repositories`, `services`, `integrations`, `hooks`, `modules`.
+- **Edge Functions** Stripe: `stripe-checkout`, `stripe-portal`, `stripe-webhook`.
+- **WhatsApp** provider layer (Evolution, Twilio, Z-API, Meta).
+- **Documentação** `docs/BACKEND.md`, `.env.example`.
+
+### Por quê
+
+- Arquitetura escalável multi-tenant ao nível de SaaS profissional (RLS + roles + billing).
+
+### Impacto
+
+- Correr migrations 004 e 005 no Supabase antes de usar novos serviços TS.
+- Frontend legado (`db.js`) continua funcional; migração gradual via `@/modules`.
+
+### Próximos passos
+
+- Ligar páginas do dashboard aos hooks/services TypeScript.
+- Deploy Edge Functions + webhook Stripe em produção.
+- Worker para envio de `whatsapp_messages`.

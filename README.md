@@ -18,18 +18,24 @@ Gestão para negócios de beleza (agenda, clientes, equipa, etc.). **Backend: Su
 
    - `001_fadely_schema.sql`
    - `002_employee_self_update.sql`
-   - `003_fix_businesses_rls_recursion.sql` — corrige erro **42P17** (recursão infinita em RLS em `businesses`) se aplicaste o `001` antigo; também já está integrado no `001` atual para instalações novas.
+   - `003_fix_businesses_rls_recursion.sql`
+   - `004_saas_multi_tenant.sql` — organizações, RBAC, pagamentos, auditoria
+   - `005_rbac_rls_analytics.sql` — RLS SaaS, analytics, onboarding RPC
 
-3. Em **Authentication → Providers**, ativa **Email** (password).
+3. (Opcional) Deploy das Edge Functions Stripe — ver `docs/BACKEND.md`.
 
-4. Instala e corre:
+4. Em **Authentication → Providers**, ativa **Email** (password).
+
+5. Copia `.env.example` → `.env.local` e preenche Stripe se usar billing.
+
+6. Instala e corre:
 
 ```bash
 npm install
 npm run dev
 ```
 
-5. Abre `http://localhost:5173`, regista-te em **/login**, conclui o **onboarding** para criar o estabelecimento.
+7. Abre `http://localhost:5173`, regista-te em **/login**, conclui o **onboarding** para criar o estabelecimento.
 
 ## Scripts
 
@@ -41,12 +47,15 @@ npm run dev
 
 ## Estrutura relevante
 
-- `src/lib/supabaseClient.js` — cliente Supabase
-- `src/repositories/db.js` — acesso a dados (substitui `base44.entities`)
+- `src/lib/supabaseClient.js` — cliente Supabase (legado)
+- `src/lib/supabase/client.ts` — cliente tipado
+- `src/modules/` — API backend (services, repos, policies)
+- `src/repositories/db.js` — CRUD legado em JS
 - `src/lib/AuthContext.jsx` — sessão Supabase Auth
-- `src/pages/Login.jsx` — login / registo email
 - `supabase/migrations/` — schema e políticas RLS
+- `supabase/functions/` — Stripe webhooks & checkout
 
 ## Documentação de arquitetura
 
-Ver `docs/CHANGELOG-ARQUITETURA.md`.
+- **Backend completo:** `docs/BACKEND.md`
+- **Changelog:** `docs/CHANGELOG-ARQUITETURA.md`

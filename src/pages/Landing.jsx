@@ -16,18 +16,20 @@ export default function Landing() {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#0A0B0F]' : 'bg-white'} relative`}>
-      <CursorGlow />
+    <>
       <Navbar />
-      <HeroSection />
-      <BusinessTypesSection />
-      <BenefitsSection />
-      <MidCTASection />
-      <TestimonialsSection />
-      <WhyFadelySection />
-      <PricingSection />
-      <FAQSection />
-      <FooterSection />
-    </div>
+      <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#0A0B0F]' : 'bg-white'} relative`}>
+        <CursorGlow />
+        <HeroSection />
+        <BusinessTypesSection />
+        <BenefitsSection />
+        <MidCTASection />
+        <TestimonialsSection />
+        <WhyFadelySection />
+        <PricingSection />
+        <FAQSection />
+        <FooterSection />
+      </div>
+    </>
   );
 }

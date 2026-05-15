@@ -201,9 +201,9 @@ export default function CalendarPage() {
             </button>
           </div>
           <button
+            type="button"
             onClick={() => setShowScheduleSettings(true)}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-xl text-white/50 hover:text-white text-xs font-medium transition-all"
-            style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+            className="cal-toolbar-btn"
           >
             <Settings2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Horários</span>
@@ -220,20 +220,20 @@ export default function CalendarPage() {
       </motion.div>
 
       {/* Calendar grid */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="cal-surface">
         {/* Day headers */}
-        <div className={`grid border-b border-white/[0.06]`} style={{ gridTemplateColumns: `60px repeat(${weekDays.length}, 1fr)` }}>
+        <div className="grid cal-header-border" style={{ gridTemplateColumns: `60px repeat(${weekDays.length}, 1fr)` }}>
           <div className="px-2 py-3" />
           {weekDays.map((day, i) => {
             const isToday = isSameDay(day, new Date());
             const dayBirthdays = clients.filter(c => isBirthdayToday(c.birthday, day));
             return (
-              <div key={i} className={`p-2 text-center border-l border-white/[0.05] ${isToday ? 'bg-blue-500/[0.05]' : ''}`}>
-                <p className="text-white/30 text-[10px] uppercase font-semibold tracking-wider">
+              <div key={i} className={`p-2 text-center cal-col-border ${isToday ? 'cal-col-today' : ''}`}>
+                <p className="cal-header-day">
                   {dayNames[i % 7]}
                 </p>
-                <div className={`text-lg font-bold mt-0.5 mx-auto w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-                  isToday ? 'bg-blue-500 text-white' : 'text-white/60'
+                <div className={`cal-day-num mt-0.5 mx-auto w-8 h-8 flex items-center justify-center rounded-full transition-all ${
+                  isToday ? 'cal-day-num-today' : ''
                 }`}>
                   {format(day, 'd')}
                 </div>
@@ -254,7 +254,7 @@ export default function CalendarPage() {
             <div className="relative">
               {timeSlots.map((slot, i) => (
                 <div key={slot} className="h-16 flex items-start justify-end pr-3 pt-1">
-                  <span className="text-white/20 text-[10px] font-medium">{slot}</span>
+                  <span className="cal-time-label">{slot}</span>
                 </div>
               ))}
             </div>
@@ -270,11 +270,11 @@ export default function CalendarPage() {
               const closed = business?.schedule_settings?.week_schedule && daySlots.length === 0;
 
               return (
-                <div key={dayIdx} className={`relative border-l border-white/[0.04] ${isToday ? 'bg-blue-500/[0.015]' : ''} ${closed ? 'bg-white/[0.008]' : ''}`}>
+                <div key={dayIdx} className={`relative cal-col-border ${isToday ? 'cal-col-today' : ''} ${closed ? 'bg-muted/30' : ''}`}>
                   {/* Closed overlay */}
                   {closed && (
                     <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                      <span className="text-white/10 text-xs font-medium rotate-[-30deg] select-none">Fechado</span>
+                      <span className="cal-closed-label rotate-[-30deg] select-none">Fechado</span>
                     </div>
                   )}
 
@@ -286,10 +286,10 @@ export default function CalendarPage() {
                     const slotAvailable = daySlots.includes(slot);
                     return (
                     <div key={slot}
-                      className={`h-16 border-b border-white/[0.03] relative group transition-colors ${
+                      className={`h-16 cal-row-border relative group transition-colors ${
                         slotAvailable && !closed
-                          ? 'hover:bg-white/[0.01] cursor-pointer'
-                          : 'opacity-30 cursor-not-allowed'
+                          ? 'cal-slot-hover'
+                          : 'cal-slot-disabled'
                       }`}
                       onClick={() => {
                         if (slotAvailable && !closed) {
@@ -336,9 +336,9 @@ export default function CalendarPage() {
                             <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: colors.dot }} />
                             <p className="text-[9px] font-bold" style={{ color: colors.text }}>{apt.time}</p>
                           </div>
-                          <p className="text-white text-[10px] font-semibold truncate leading-tight">{apt.client_name}</p>
+                          <p className="cal-apt-title">{apt.client_name}</p>
                           {durationSlots > 1 && (
-                            <p className="text-white/35 text-[9px] truncate mt-0.5">{apt.service_name}</p>
+                            <p className="cal-apt-sub">{apt.service_name}</p>
                           )}
                         </div>
                       </motion.button>
