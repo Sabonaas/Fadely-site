@@ -11,8 +11,7 @@ export default function ThemeToggle({ compact = false }) {
       <button
         onClick={toggle}
         title={isDark ? 'Mudar para claro' : 'Mudar para escuro'}
-        className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:opacity-80"
-        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+        className="w-8 h-8 rounded-xl flex items-center justify-center transition-all border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-accent"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
@@ -23,7 +22,7 @@ export default function ThemeToggle({ compact = false }) {
             transition={{ duration: 0.2 }}
           >
             {isDark ? (
-              <Moon className="w-4 h-4 text-white/50" />
+              <Moon className="w-4 h-4 text-blue-400" />
             ) : (
               <Sun className="w-4 h-4 text-yellow-400" />
             )}
@@ -36,8 +35,7 @@ export default function ThemeToggle({ compact = false }) {
   return (
     <button
       onClick={toggle}
-      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all text-left"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all text-left border border-border bg-card hover:bg-accent/60"
     >
       <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
         style={{ background: isDark ? 'rgba(79,142,247,0.12)' : 'rgba(251,191,36,0.15)' }}>
@@ -58,8 +56,8 @@ export default function ThemeToggle({ compact = false }) {
         </AnimatePresence>
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-white/55 text-xs font-medium">{isDark ? 'Modo Escuro' : 'Modo Claro'}</p>
-        <p className="text-white/25 text-[10px]">Clique para alternar</p>
+        <p className="text-foreground/80 text-xs font-medium">{isDark ? 'Modo Escuro' : 'Modo Claro'}</p>
+        <p className="text-muted-foreground text-[10px]">Clique para alternar</p>
       </div>
       {/* Toggle track */}
       <div className="relative w-9 h-5 rounded-full flex-shrink-0 transition-all"

@@ -51,7 +51,7 @@ export default function DashboardLayout() {
       <MobileSidebar business={business} />
       <main className="dashboard-main">
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full min-w-0">
-          <Outlet context={{ business }} />
+        <Outlet context={{ business }} />
         </div>
       </main>
     </div>

@@ -36,22 +36,16 @@ export default function MobileSidebar({ business }) {
     <div className="lg:hidden">
       {/* Top bar */}
       <div
-        className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 z-50"
-        style={{
-          background: 'rgba(8,9,14,0.95)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
-        }}
+        className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 z-50 bg-card/95 border-b border-border backdrop-blur-xl"
       >
         <div className="flex items-center gap-3">
           <button
             onClick={() => setOpen(true)}
-            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all border border-border bg-card hover:bg-accent"
           >
-            <Menu className="w-4 h-4 text-white/60" />
+            <Menu className="w-4 h-4 text-muted-foreground" />
           </button>
-          <span className="text-white/70 text-sm font-medium">{currentPage}</span>
+          <span className="text-foreground/80 text-sm font-medium">{currentPage}</span>
         </div>
 
         <FadelyLogo size="sm" showWordmark={false} />
@@ -80,19 +74,14 @@ export default function MobileSidebar({ business }) {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 350, damping: 35 }}
-              className="fixed left-0 top-0 bottom-0 w-72 z-50 flex flex-col"
-              style={{
-                background: 'rgba(8,9,14,0.99)',
-                borderRight: '1px solid rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(24px)',
-              }}
+              className="fixed left-0 top-0 bottom-0 w-72 z-50 flex flex-col bg-card/95 border-r border-border backdrop-blur-xl"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-5 border-b border-white/[0.05]">
+              <div className="flex items-center justify-between px-5 py-5 border-b border-border">
                 <FadelyLogo size="sm" />
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-white/30 hover:text-white hover:bg-white/5 transition-all"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -100,15 +89,15 @@ export default function MobileSidebar({ business }) {
 
               {/* Business info */}
               {business && (
-                <div className="px-5 py-3 border-b border-white/[0.05]">
+                <div className="px-5 py-3 border-b border-border">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
                       style={{ background: 'linear-gradient(135deg, #4F8EF7, #7B5EEA)' }}>
                       {business.name?.[0]?.toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-white/80 text-sm font-medium">{business.name}</p>
-                      <p className="text-white/25 text-xs">Estabelecimento</p>
+                      <p className="text-foreground/80 text-sm font-medium">{business.name}</p>
+                      <p className="text-muted-foreground text-xs">Estabelecimento</p>
                     </div>
                   </div>
                 </div>
@@ -121,7 +110,7 @@ export default function MobileSidebar({ business }) {
                   return (
                     <Link key={item.path} to={item.path} onClick={() => setOpen(false)}>
                       <div className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all ${
-                        active ? 'text-white' : 'text-white/40'
+                        active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                       }`}
                         style={active ? {
                           background: 'rgba(79,142,247,0.1)',
@@ -138,11 +127,11 @@ export default function MobileSidebar({ business }) {
               </nav>
 
               {/* Bottom */}
-              <div className="px-3 py-4 border-t border-white/[0.05] space-y-1">
+              <div className="px-3 py-4 border-t border-border space-y-1">
                 <ThemeToggle />
                 {business?.slug && (
                   <Link to={`/book/${business.slug}`} target="_blank" onClick={() => setOpen(false)}>
-                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/35 hover:text-white/60 transition-all">
+                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">
                       <Globe className="w-4 h-4" />
                       <span>Página Pública</span>
                     </div>
@@ -150,7 +139,7 @@ export default function MobileSidebar({ business }) {
                 )}
                 <button
                   onClick={() => { logout('/'); }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/25 hover:text-red-400 hover:bg-red-500/5 transition-all"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sair</span>

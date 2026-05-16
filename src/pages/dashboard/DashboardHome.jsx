@@ -19,13 +19,11 @@ function StatCard({ icon: Icon, title, value, sub, color, delay }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="relative rounded-2xl p-5 overflow-hidden group"
-      style={{
-        background: 'rgba(255,255,255,0.02)',
-        border: '1px solid rgba(255,255,255,0.06)',
+      className="relative rounded-2xl p-5 overflow-hidden group bg-card border border-border"
+        style={{
         backdropFilter: 'blur(12px)',
       }}
-    >
+>
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: `radial-gradient(circle at 70% 30%, ${color}08, transparent 70%)` }} />
       <div className="flex items-start justify-between mb-4">
@@ -34,8 +32,8 @@ function StatCard({ icon: Icon, title, value, sub, color, delay }) {
           <Icon className="w-4 h-4" style={{ color }} />
         </div>
       </div>
-      <p className="text-2xl font-bold text-white mb-1">{value}</p>
-      <p className="text-white/40 text-sm">{title}</p>
+      <p className="text-2xl font-bold text-foreground mb-1">{value}</p>
+      <p className="text-muted-foreground text-sm">{title}</p>
       {sub && <p className="text-xs mt-1" style={{ color }}>{sub}</p>}
     </motion.div>
   );
@@ -93,14 +91,14 @@ export default function DashboardHome() {
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">
             {greeting}, {business.name?.split(' ')[0]} 👋
           </h1>
-          <p className="text-white/35 text-sm mt-0.5 capitalize">{dayLabel}</p>
+          <p className="text-muted-foreground text-sm mt-0.5 capitalize">{dayLabel}</p>
         </div>
         <Link
           to="/dashboard/calendar"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90 self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-foreground transition-all hover:opacity-90 self-start sm:self-auto"
           style={{ background: 'linear-gradient(135deg, #4F8EF7, #7B5EEA)', boxShadow: '0 0 20px rgba(79,142,247,0.25)' }}
         >
           <Plus className="w-4 h-4" />
@@ -111,8 +109,8 @@ export default function DashboardHome() {
       {/* Stats grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard icon={Calendar} title="Hoje" value={todayAppointments.length} sub={`${completedToday} concluídos`} color="#4F8EF7" delay={0} />
-        <StatCard icon={Users} title="Clientes" value={clients.length} color="#a855f7" delay={0.05} />
-        <StatCard icon={Scissors} title="Serviços" value={services.filter(s => s.is_active !== false).length} color="#22c55e" delay={0.1} />
+        <StatCard icon={Users} title="Clientes" value={clients.length} sub={`${clients.length} clientes`} color="#a855f7" delay={0.05} />
+        <StatCard icon={Scissors} title="Serviços" value={services.filter(s => s.is_active !== false).length} sub={`${services.filter(s => s.is_active !== false).length} serviços`} color="#22c55e" delay={0.1} />
         <StatCard icon={TrendingUp} title="Receita" value={`R$${totalRevenue.toFixed(0)}`} sub={`${pendingCount} pendentes`} color="#f59e0b" delay={0.15} />
       </div>
 
@@ -142,7 +140,7 @@ export default function DashboardHome() {
           {todayAppointments.length === 0 ? (
             <div className="text-center py-10">
               <Clock className="w-8 h-8 text-white/15 mx-auto mb-3" />
-              <p className="text-white/30 text-sm">Nenhum agendamento hoje</p>
+              <p className="text-muted-foreground text-sm">Nenhum agendamento hoje</p>
               <Link to="/dashboard/calendar" className="inline-flex items-center gap-1.5 mt-3 text-xs text-blue-400 hover:text-blue-300">
                 <Plus className="w-3 h-3" /> Agendar agora
               </Link>
@@ -157,19 +155,19 @@ export default function DashboardHome() {
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 + i * 0.04 }}
-                    className="flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-white/[0.02]"
+                    className="flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-card"
                     style={{ border: '1px solid rgba(255,255,255,0.04)' }}
                   >
                     <div className="text-center w-12 flex-shrink-0">
-                      <p className="text-white font-bold text-sm">{apt.time}</p>
+                      <p className="text-foreground font-bold text-sm">{apt.time}</p>
                     </div>
                     <div className="w-px h-8 flex-shrink-0" style={{ background: sc.color + '40' }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium truncate">{apt.client_name}</p>
-                      <p className="text-white/35 text-xs truncate">{apt.service_name}</p>
+                      <p className="text-foreground text-sm font-medium truncate">{apt.client_name}</p>
+                      <p className="text-muted-foreground text-xs truncate">{apt.service_name}</p>
                     </div>
                     {apt.employee_name && (
-                      <p className="text-white/25 text-xs hidden sm:block truncate max-w-[80px]">{apt.employee_name}</p>
+                      <p className="text-muted-foreground text-xs hidden sm:block truncate max-w-[80px]">{apt.employee_name}</p>
                     )}
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0"
                       style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
@@ -197,16 +195,16 @@ export default function DashboardHome() {
             }}>
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-4 h-4 text-blue-400" />
-              <span className="text-white/60 text-xs font-medium uppercase tracking-wide">Plano Atual</span>
+              <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Plano Atual</span>
             </div>
-            <p className="text-white font-semibold capitalize">
+            <p className="text-foreground font-semibold capitalize">
               {business.subscription_plan === 'free_trial' ? 'Período de Teste' :
                business.subscription_plan === 'starter' ? 'Essencial' :
                business.subscription_plan === 'professional' ? 'Crescimento' :
                business.subscription_plan === 'enterprise' ? 'Elite' :
                business.subscription_plan}
             </p>
-            <p className="text-white/30 text-xs mt-1">
+            <p className="text-muted-foreground text-xs mt-1">
               {business.subscription_status === 'trial' ? '14 dias gratuitos' : 'Ativo'}
             </p>
           </div>
@@ -217,14 +215,15 @@ export default function DashboardHome() {
               background: 'rgba(255,255,255,0.018)',
               border: '1px solid rgba(255,255,255,0.06)',
             }}>
-            <p className="text-white/40 text-xs font-medium uppercase tracking-wide mb-3">Acesso Rápido</p>
+
+            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide mb-3">Acesso Rápido</p>
             {[
               { label: 'Gerenciar Clientes', path: '/dashboard/clients', icon: Users },
               { label: 'Ver Relatórios', path: '/dashboard/reports', icon: TrendingUp },
               { label: 'Configurar Serviços', path: '/dashboard/services', icon: Scissors },
             ].map(item => (
               <Link key={item.path} to={item.path}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white/80 hover:bg-white/[0.03] transition-all group">
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-white/80 hover:bg-white/[0.03] transition-all group">
                 <item.icon className="w-3.5 h-3.5 flex-shrink-0 group-hover:text-blue-400 transition-colors" />
                 <span>{item.label}</span>
                 <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />

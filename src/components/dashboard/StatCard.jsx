@@ -6,7 +6,7 @@ export default function StatCard({ title, value, icon: Icon, trend, delay = 0 })
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
-      className="p-6 rounded-2xl border border-white/5 bg-white/[0.02]"
+      className="p-6 rounded-2xl border border-border bg-card text-card-foreground"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
@@ -20,8 +20,8 @@ export default function StatCard({ title, value, icon: Icon, trend, delay = 0 })
           </span>
         )}
       </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
-      <p className="text-sm text-white/40 mt-1">{title}</p>
+      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-sm text-muted-foreground mt-1">{title}</p>
     </motion.div>
   );
 }
